@@ -1,0 +1,344 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-sensai-bg: #050608;
+  --color-sensai-card: rgba(9, 11, 18, 0.7);
+  --color-sensai-primary: #8b5cf6;
+  --color-sensai-secondary: #4f46e5;
+  --color-sensai-text: #f8fafc;
+  --color-sensai-muted: #94a3b8;
+  --color-glass: rgba(255, 255, 255, 0.08);
+  
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-orbitron: "Outfit", sans-serif;
+  --font-mono: "Inter", sans-serif;
+  
+  --shadow-glass: 0 16px 40px -10px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* Platform-wide increased readability typography scale variables - Even larger for maximum readability */
+  --font-size-xs: 0.95rem;      /* ~15.2px */
+  --font-size-sm: 1.05rem;      /* ~16.8px */
+  --font-size-base: 1.2rem;     /* ~19.2px */
+  --font-size-lg: 1.35rem;      /* ~21.6px */
+  --font-size-xl: 1.6rem;       /* ~25.6px */
+  --font-size-2xl: 2.0rem;      /* ~32px */
+  --font-size-3xl: 2.6rem;      /* ~41.6px */
+  --font-size-4xl: 3.4rem;      /* ~54.4px */
+  --font-size-5xl: 4.4rem;      /* ~70.4px */
+}
+
+@layer base {
+  body {
+    @apply bg-sensai-bg text-sensai-text font-body antialiased min-h-screen relative overflow-x-hidden text-lg md:text-xl leading-relaxed tracking-wide;
+    /* Soft, luxurious dark SaaS radial glow background that slowly shifts in fluid motion */
+    background-image: 
+      radial-gradient(at 10% 20%, rgba(20, 184, 166, 0.12) 0px, transparent 45%),
+      radial-gradient(at 90% 80%, rgba(139, 92, 246, 0.12) 0px, transparent 45%),
+      radial-gradient(at 50% 10%, rgba(79, 70, 229, 0.08) 0px, transparent 40%),
+      radial-gradient(rgba(255, 255, 255, 0.009) 1px, transparent 1px);
+    background-size: 140% 140%, 140% 140%, 140% 140%, 28px 28px;
+    animation: meshMovement 22s ease-in-out infinite alternate;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight font-bold text-white;
+  }
+}
+
+@layer components {
+  /* Premium Minimal Glass Card */
+  .hud-card, .glass {
+    @apply bg-sensai-card backdrop-blur-2xl border border-glass shadow-glass rounded-2xl relative overflow-hidden transition-all duration-300;
+  }
+
+  /* Remove all old HUD rigid bracket elements */
+  .hud-card::before, .hud-card::after,
+  .glass::before, .glass::after,
+  .hud-card-bottom-left::before, .hud-card-bottom-right::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .hud-card-hover, .glass-hover {
+    @apply hover:border-teal-500/30 hover:shadow-[0_20px_50px_-12px_rgba(20,184,166,0.15)] hover:-translate-y-1;
+  }
+
+  /* Sleek, Modern SaaS Buttons - Increased sizing for ultimate readability */
+  .btn-primary {
+    @apply bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-heading text-sm tracking-wide px-8 py-4.5 rounded-xl font-bold 
+           flex items-center justify-center gap-2 transition-all duration-300 hover:brightness-110 hover:shadow-[0_4px_25px_rgba(139,92,246,0.3)]
+           hover:scale-[1.01] active:scale-95 cursor-pointer border-none;
+  }
+
+  .btn-secondary {
+    @apply bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white font-heading text-sm tracking-wide px-8 py-4.5 rounded-xl font-bold 
+           flex items-center justify-center gap-2 transition-all duration-300 hover:border-white/20 hover:shadow-[0_4px_15px_rgba(255,255,255,0.03)]
+           hover:scale-[1.01] active:scale-95 cursor-pointer;
+  }
+
+  /* Polished Input Fields - Increased sizing & padding */
+  .input-field {
+    @apply bg-white/[0.03] border border-white/10 rounded-xl px-6 py-4.5 text-base text-white w-full outline-none font-body tracking-wide transition-all duration-300
+           focus:border-sensai-primary/40 focus:bg-white/[0.06] focus:ring-2 focus:ring-sensai-primary/20 focus:shadow-[0_0_20px_rgba(139,92,246,0.15)];
+  }
+
+  /* Refined Badges - Increased text size for clear readability */
+  .badge {
+    @apply px-3 py-1.5 rounded-lg font-heading text-xs font-bold uppercase tracking-wider border;
+  }
+
+  .badge-success { @apply bg-emerald-500/10 text-emerald-400 border-emerald-500/20; }
+  .badge-warning { @apply bg-amber-500/10 text-amber-400 border-amber-500/20; }
+  .badge-danger { @apply bg-rose-500/10 text-rose-400 border-rose-500/20; }
+}
+
+/* Remove scanline animation overlay cleanly */
+.scanline {
+  display: none !important;
+}
+
+/* Background animated mesh movement keyframes */
+@keyframes meshMovement {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 0% 0%;
+  }
+  50% {
+    background-position: 40% 60%, 60% 40%, 30% 70%, 0% 0%;
+  }
+  100% {
+    background-position: 80% 20%, 20% 80%, 70% 30%, 0% 0%;
+  }
+}
+
+/* Custom Cursor Click Ripple Wave Animation */
+@keyframes cursorRipple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+    border-color: rgba(20, 184, 166, 0.8);
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.4);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+    border-color: rgba(139, 92, 246, 0);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0);
+  }
+}
+
+.animate-cursor-ripple {
+  animation: cursorRipple 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+/* Micro-animations */
+.pulsate-core {
+  animation: corePulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes corePulse {
+  0% { transform: scale(1); opacity: 0.85; filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.2)); }
+  100% { transform: scale(1.03); opacity: 1; filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4)); }
+}
+
+.spin-slow {
+  animation: spinSlow 40s linear infinite;
+}
+
+.spin-reverse-slow {
+  animation: spinReverseSlow 32s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinReverseSlow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.page-transition {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* soundwave active signals */
+.sound-wave-bar {
+  display: inline-block;
+  width: 2px;
+  height: 6px;
+  background-color: #8b5cf6;
+  margin: 0 1px;
+  animation: bounceWave 0.8s ease-in-out infinite alternate;
+}
+
+.sound-wave-bar:nth-child(2) { animation-delay: 0.15s; }
+.sound-wave-bar:nth-child(3) { animation-delay: 0.3s; }
+.sound-wave-bar:nth-child(4) { animation-delay: 0.45s; }
+
+@keyframes bounceWave {
+  0% { transform: scaleY(1); }
+  100% { transform: scaleY(2.2); }
+}
+
+/* Clean PDF Export Styling matching minimal theme */
+body.pdf-export-active {
+  background-color: #07080a !important;
+}
+
+.pdf-export-active .pdf-mode {
+  background-color: #07080a !important; 
+  color: #ffffff !important;
+  font-family: 'Inter', sans-serif !important;
+  min-height: 100vh !important;
+}
+
+.pdf-export-active * {
+  text-shadow: none !important; 
+  box-shadow: none !important;
+}
+
+.pdf-export-active .text-transparent {
+  color: #8b5cf6 !important;
+  -webkit-text-fill-color: #8b5cf6 !important;
+}
+.pdf-export-active .bg-clip-text {
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  background-image: none !important;
+}
+
+.pdf-export-active .glass, .pdf-export-active .hud-card { 
+  background-color: #0d101a !important; 
+  border: 1px solid #1e293b !important; 
+  border-radius: 16px !important;
+  backdrop-filter: none !important; 
+}
+
+.pdf-export-active .text-sensai-primary, .pdf-export-active .text-cyan-400 { color: #8b5cf6 !important; }
+.pdf-export-active .text-sensai-secondary, .pdf-export-active .text-blue-400 { color: #4f46e5 !important; }
+.pdf-export-active .text-white, .pdf-export-active h1, .pdf-export-active h2, .pdf-export-active h3 { color: #ffffff !important; }
+.pdf-export-active .text-sensai-muted, .pdf-export-active .text-slate-400, .pdf-export-active p { color: #94a3b8 !important; } 
+
+.pdf-export-active .bg-gradient-to-br {
+  background-image: none !important;
+  background-color: transparent !important;
+  color: #8b5cf6 !important;
+}
+
+/* Ambient background floating keyframes */
+@keyframes floatBlob1 {
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  33% { transform: translate(60px, 40px) scale(1.15) rotate(120deg); }
+  66% { transform: translate(-40px, 80px) scale(0.9) rotate(240deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(360deg); }
+}
+
+@keyframes floatBlob2 {
+  0% { transform: translate(0px, 0px) scale(1) rotate(360deg); }
+  50% { transform: translate(-80px, -60px) scale(0.85) rotate(180deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+}
+
+@keyframes floatBlob3 {
+  0% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  50% { transform: translate(50px, -70px) scale(1.1) rotate(-180deg); }
+  100% { transform: translate(0px, 0px) scale(1) rotate(360deg); }
+}
+
+.animate-float-blob-1 {
+  animation: floatBlob1 28s ease-in-out infinite alternate;
+}
+
+.animate-float-blob-2 {
+  animation: floatBlob2 36s ease-in-out infinite alternate;
+}
+
+.animate-float-blob-3 {
+  animation: floatBlob3 32s ease-in-out infinite alternate;
+}
+
+/* Custom Cursor sparkles and click explosion elements */
+@keyframes sparkFade {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-spark-burst {
+  animation: sparkFade var(--duration) cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes cursorSparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-15px) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-cursor-sparkle {
+  animation: cursorSparkle 0.6s ease-out forwards;
+}
+
+/* mobile touch wave tap feedback */
+@keyframes touchWave {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 1;
+    border-color: rgba(20, 184, 166, 0.7);
+    box-shadow: 0 0 10px rgba(20, 184, 166, 0.3);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+    border-color: rgba(139, 92, 246, 0);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0);
+  }
+}
+
+.animate-touch-wave {
+  animation: touchWave 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+/* Endless scrolling marquee animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Upvote floating feedback pop animation */
+@keyframes floatUpFade {
+  0% { transform: translateY(0) scale(0.7); opacity: 0; }
+  20% { transform: translateY(-12px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-38px) scale(0.95); opacity: 0; }
+}
+
+.animate-float-up-fade {
+  animation: floatUpFade 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
