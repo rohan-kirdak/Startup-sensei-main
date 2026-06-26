@@ -69,6 +69,10 @@ export const createOrder = async (req, res, next) => {
       currency: order.currency,
     });
   } catch (error) {
+    if (error.error && error.error.description) {
+      res.status(error.statusCode || 400);
+      return next(new Error(`Razorpay Error: ${error.error.description}`));
+    }
     next(error);
   }
 };

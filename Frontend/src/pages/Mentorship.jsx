@@ -256,6 +256,21 @@ const Mentorship = () => {
       // 2. Create Order on Backend
       const { data: orderData } = await api.post('/payment/order', { sessionId: session._id });
 
+      if (orderData.isMock) {
+        // Auto-verify mock payment
+        const verifyPayload = {
+          razorpay_payment_id: "pay_mock_" + Math.random().toString(36).substring(7),
+          razorpay_order_id: orderData.orderId,
+          razorpay_signature: "mock_signature",
+          sessionId: session._id
+        };
+        await api.post('/payment/verify', verifyPayload);
+        fetchSessions();
+        alert("Payment verified and booking confirmed successfully!");
+        setPaymentLoadingId(null);
+        return;
+      }
+
       const partyName = session.mentor?.user?.name || 'Expert Advisor';
 
       // 3. Configure Razorpay Options

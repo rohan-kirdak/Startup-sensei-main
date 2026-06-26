@@ -118,7 +118,7 @@ IMPORTANT INSTRUCTIONS
 6. Do not repeat user input unnecessarily.
 7. Make the report feel premium and consultancy-grade (think McKinsey, Deloitte, or Y Combinator advisory).
 8. Include strategic risks, realistic weaknesses, execution difficulties, and critical weaknesses. Think like a critical investor.
-9. Output should be detailed, comprehensive, and long-form.
+9. Keep sections analytical and detailed but concise and punchy to prevent output truncation.
 10. Use clean markdown formatting.
 11. Avoid emojis completely.
 13. Make the output polished enough to export directly as PDF.
@@ -251,11 +251,13 @@ Do not add any markdown code block wrap (such as \`\`\`json) outside the JSON un
 
     console.log("Requesting AI completion...");
     const completion = await openai.chat.completions.create({
-      model: isGeminiKey ? "gemini-flash-latest" : "gpt-4o-mini",
+      model: isGeminiKey ? "models/gemini-2.5-flash" : "gpt-4o-mini",
       messages: [
         { role: "system", content: "You are a professional startup consultant. Response must be in valid JSON format." },
         { role: "user", content: prompt }
-      ]
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 8192
     });
 
     const content = completion.choices[0].message.content;
