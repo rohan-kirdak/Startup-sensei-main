@@ -139,6 +139,7 @@ IMPORTANT INSTRUCTIONS
 15. Ensure the JSON response is complete and valid.
 16. Keep total response under 800 words.
 17. Limit every section to 50 words (or 30 words where indicated).
+18. CRITICAL: Never use double quotes (") inside JSON string values. If you need to quote or refer to a term, use single quotes (') instead.
 
 ---------------------------------------------------
 REQUIRED OUTPUT JSON FORMAT
@@ -306,7 +307,7 @@ Keep all field values concise.
 Ensure the final JSON fits within token limits.
 IMPORTANT JSON RULES:
 - Return valid JSON only.
-- Escape all quotes inside strings.
+- Never use double quotes (") inside your JSON string values. If you need to quote, highlight, or refer to a term (e.g. 'smart composting', 'LTV/CAC'), use single quotes (') instead.
 - Do not use markdown tables.
 - Do not use pipe characters |.
 - Do not include code blocks.
