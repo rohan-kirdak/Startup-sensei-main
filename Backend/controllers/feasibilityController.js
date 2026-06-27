@@ -14,14 +14,26 @@ const openai = new OpenAI({
  */
 const parseAIResponse = (content) => {
   try {
-    // Remove markdown code blocks if present (e.g., ```json ... ``` or ``` ...)
-    const cleanedContent = content.replace(/```(?:json)?\s*([\s\S]*?)\s*```/g, "$1").trim();
-    // If there's still something outside the JSON, this regex might need adjustment, 
-    // but usually Gemini/OpenAI with json_object mode are pretty good.
-    return JSON.parse(cleanedContent || content);
+    const cleanedContent = content
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    const parsed = JSON.parse(cleanedContent);
+
+    console.log("PARSE SUCCESS");
+    console.log("FIELDS:", Object.keys(parsed));
+
+    return parsed;
+
   } catch (error) {
-    console.error("AI_PARSE_ERROR. Raw Content:", content);
-    throw new Error("AI returned an invalid response format. Please try again.");
+    console.error("PARSE REAL ERROR:");
+    console.error(error); // <-- important
+
+    console.error("RAW CONTENT:");
+    console.error(content);
+
+    throw error;
   }
 };
 
@@ -31,9 +43,9 @@ export const generateReport = async (req, res, next) => {
   let reportId = null;
 
   try {
-    const { 
-      startupName, 
-      ideaDescription, 
+    const {
+      startupName,
+      ideaDescription,
       targetMarket,
       founderName,
       industry,
@@ -121,7 +133,12 @@ IMPORTANT INSTRUCTIONS
 9. Keep sections analytical and detailed but concise and punchy to prevent output truncation.
 10. Use clean markdown formatting.
 11. Avoid emojis completely.
-13. Make the output polished enough to export directly as PDF.
+12. Make the output polished enough to export directly as PDF.
+13. Keep the report concise, investor-grade, and structured.
+14. Do not generate excessively long explanations.
+15. Ensure the JSON response is complete and valid.
+16. Keep total response under 800 words.
+17. Limit every section to 50 words (or 30 words where indicated).
 
 ---------------------------------------------------
 REQUIRED OUTPUT JSON FORMAT
@@ -130,7 +147,7 @@ Return ONLY a valid JSON object with the following structure:
 {
   "overallScore": <number between 0 and 100 representing the AI success score based on market demand, competition, innovation, revenue potential, scalability, and execution complexity>,
   
-  "marketAnalysis": "Generate sections 1 to 4 in clean markdown. Keep it long-form, highly detailed, and analytical:
+  "marketAnalysis": "Generate sections 1 to 4 in clean markdown. Keep it concise, professional, and under 50 words per section:
 # 1. Executive Summary
 - Startup overview
 - Vision
@@ -160,9 +177,22 @@ Return ONLY a valid JSON object with the following structure:
 - Estimated market potential
 - Scalability possibilities",
 
-  "competitorOverview": "Generate sections 5 to 6 in clean markdown:
+  "competitorOverview": "Generate sections 5 to 6 in clean markdown. Keep each section under 50 words:
 # 5. Competitor Analysis
-Create a beautifully formatted markdown table comparing this startup against key competitors on strengths, weaknesses, pricing style, market position, and competitive advantage.
+
+Return competitor analysis as bullet points.
+
+Format:
+
+Competitor: XYZ
+- Strengths:
+- Weaknesses:
+- Pricing Style:
+- Market Position:
+- Competitive Advantage:
+
+Do NOT use markdown tables.
+Do NOT use pipe characters |.
 
 # 6. SWOT Analysis
 Generate detailed, critical analysis of:
@@ -171,7 +201,7 @@ Generate detailed, critical analysis of:
 - Opportunities
 - Threats",
 
-  "revenueProjection": "Generate sections 7, 9, and 10 in clean markdown:
+  "revenueProjection": "Generate sections 7, 9, and 10 in clean markdown. Keep each section under 50 words:
 # 7. Business Model Analysis
 - Revenue generation strategy
 - Monetization model
@@ -196,15 +226,34 @@ Generate realistic projections:
 - Revenue prediction
 - Break-even estimation
 - Profitability timeline
-- Provide a clean markdown table showing realistic Year 1, Year 2, and Year 3 projections (revenues, expenses, profits).",
+- Provide projections as bullet points:
 
-  "riskAssessment": "Generate sections 8, 11, 12, 13, 14, 15, and 16 in clean markdown:
+Year 1
+- Revenue:
+- Expenses:
+- Profit:
+
+Year 2
+- Revenue:
+- Expenses:
+- Profit:
+
+Year 3
+- Revenue:
+- Expenses:
+- Profit:
+
+Do NOT use markdown tables.",
+
+  "riskAssessment": "Generate a concise summary for sections 8, 11, 12, 13, 14, 15, and 16.
+Limit each section to 30 words maximum. Ensure total content in this field is extremely brief and punchy.
 # 8. AI-Based Startup Success Score
 - Analysis of the overall score
 - Breakdown by Market demand, Competition, Innovation, Revenue potential, Scalability, and Execution complexity
 - Key improvement areas
 
 # 11. Funding & Investment Readiness
+(Max 30 words)
 - Whether startup is investment-ready
 - Ideal funding stage
 - Possible investor types
@@ -212,6 +261,7 @@ Generate realistic projections:
 - Investor attraction strategy
 
 # 12. Product Development Roadmap
+(Max 30 words)
 Generate a clean timeline-based markdown structure:
 - MVP stage
 - Beta launch
@@ -219,6 +269,7 @@ Generate a clean timeline-based markdown structure:
 - Expansion phase
 
 # 13. Risk Analysis
+(Max 30 words)
 - Business risks and mitigation
 - Technical risks and mitigation
 - Market risks and mitigation
@@ -226,6 +277,7 @@ Generate a clean timeline-based markdown structure:
 - Legal/compliance risks and mitigation
 
 # 14. Operational Strategy
+(Max 30 words)
 - Team structure
 - Hiring priorities
 - Tech stack recommendations
@@ -233,6 +285,7 @@ Generate a clean timeline-based markdown structure:
 - Customer support strategy
 
 # 15. Final Strategic Recommendations
+(Max 30 words)
 - Top priorities
 - Immediate next steps
 - High-impact improvements
@@ -240,6 +293,7 @@ Generate a clean timeline-based markdown structure:
 - Founder guidance
 
 # 16. Final Conclusion
+(Max 30 words)
 - Startup potential summary
 - Market viability
 - Long-term sustainability
@@ -247,6 +301,22 @@ Generate a clean timeline-based markdown structure:
 }
 
 Do not add any markdown code block wrap (such as \`\`\`json) outside the JSON unless requested, just return the JSON object directly.
+Do not add markdown code blocks.
+Keep all field values concise.
+Ensure the final JSON fits within token limits.
+IMPORTANT JSON RULES:
+- Return valid JSON only.
+- Escape all quotes inside strings.
+- Do not use markdown tables.
+- Do not use pipe characters |.
+- Do not include code blocks.
+- Ensure JSON.parse() can parse the response successfully.
+Ensure the final JSON fits within token limits.
+
+CRITICAL:
+Total response must be less than 800 words.
+If output becomes too long, summarize instead of expanding.
+Never exceed the response limit.
 `;
 
     console.log("Requesting AI completion...");
@@ -256,12 +326,15 @@ Do not add any markdown code block wrap (such as \`\`\`json) outside the JSON un
         { role: "system", content: "You are a professional startup consultant. Response must be in valid JSON format." },
         { role: "user", content: prompt }
       ],
-      response_format: { type: "json_object" },
-      max_tokens: 8192
+      //response_format: { type: "json_object" },
+      max_tokens: 4096
     });
 
     const content = completion.choices[0].message.content;
+    console.log("COMPLETION CHOICE:", JSON.stringify(completion.choices[0], null, 2));
     const aiResult = parseAIResponse(content);
+    console.log("AI RESULT:");
+    console.log(aiResult);
 
     report.aiReport = aiResult;
     report.status = "generated";
@@ -272,17 +345,17 @@ Do not add any markdown code block wrap (such as \`\`\`json) outside the JSON un
     console.error("GENERATE_REPORT_ERROR:", error.message);
     if (error.status) console.error("Error Status:", error.status);
     if (error.response?.data) console.error("Error Response Data:", JSON.stringify(error.response.data));
-    
+
     // If we created a report but generation failed, update status or delete it
     if (reportId) {
-       await FeasibilityReport.findByIdAndDelete(reportId).catch(err => console.error("Error cleaning up report:", err));
+      await FeasibilityReport.findByIdAndDelete(reportId).catch(err => console.error("Error cleaning up report:", err));
     }
 
     // Map AI service 404 (model not found) to 502 Bad Gateway to avoid confusing the UI/Router into thinking the Express route is missing
     let status = error.status || 500;
     if (status === 404) status = 502;
     const message = error.message || "Internal Server Error during report generation";
-    
+
     res.status(status).json({ message });
   }
 };

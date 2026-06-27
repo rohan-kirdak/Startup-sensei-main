@@ -52,7 +52,37 @@ export const getMySessions = async (req, res, next) => {
       })
       .sort({ scheduledAt: -1 });
 
-    res.json(sessions);
+    const now = new Date();
+    const processedSessions = [];
+
+    for (let session of sessions) {
+      const scheduledTime = new Date(session.scheduledAt);
+      const endTime = new Date(scheduledTime.getTime() + (session.duration || 60) * 60 * 1000);
+
+      if (now > endTime) {
+        let needsUpdate = false;
+        const updateFields = {};
+
+        if (session.meetingLink) {
+          session.meetingLink = null;
+          updateFields.meetingLink = null;
+          needsUpdate = true;
+        }
+
+        if (session.status === "confirmed") {
+          session.status = "completed";
+          updateFields.status = "completed";
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+          await Session.updateOne({ _id: session._id }, { $set: updateFields });
+        }
+      }
+      processedSessions.push(session);
+    }
+
+    res.json(processedSessions);
   } catch (error) {
     next(error);
   }
